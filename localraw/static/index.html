@@ -1,0 +1,810 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#faf9f4" />
+    <meta
+      name="description"
+      content="CapreConvert converts documents and Canon CR3 photos locally. Choose DOCX to PDF, text-only PDF to DOCX, CR3 to JPG, or CR3 to PNG."
+    />
+    <title>CapreConvert — Your files. Converted locally.</title>
+    <link rel="icon" href="/static/assets/mark.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/static/styles.css" />
+    <script type="module" src="/static/app.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="topbar">
+      <button
+        id="navigation-toggle"
+        class="icon-button navigation-toggle"
+        type="button"
+        aria-label="Toggle workspace navigation"
+        aria-controls="workspace-navigation"
+        aria-expanded="true"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+      <a class="brand" href="#home" aria-label="CapreConvert home"
+        ><img
+          src="/static/assets/mark.svg"
+          width="34"
+          height="34"
+          alt=""
+        /><span
+          >Capre<strong>Convert</strong><span class="brand-dot">.</span></span
+        ></a
+      >
+      <div class="header-breadcrumb">
+        <span>Local workspace</span><span aria-hidden="true">/</span
+        ><strong id="current-section-label">Convert files</strong>
+      </div>
+      <div class="header-actions">
+        <span class="local-badge"
+          ><span class="status-dot"></span>100% on your computer</span
+        ><button
+          id="theme-toggle"
+          class="icon-button"
+          type="button"
+          aria-label="Switch color theme"
+        >
+          ◐
+        </button>
+      </div>
+    </header>
+    <button
+      id="navigation-scrim"
+      class="navigation-scrim"
+      type="button"
+      aria-label="Close workspace navigation"
+      hidden
+    ></button>
+    <aside
+      id="workspace-navigation"
+      class="workspace-navigation"
+      aria-label="Workspace sidebar"
+    >
+      <div class="navigation-body">
+        <div class="workspace-identity">
+          <span class="workspace-avatar" aria-hidden="true">CC</span>
+          <div>
+            <strong>Local workspace</strong><span>Private file conversion</span>
+          </div>
+        </div>
+        <nav aria-label="Workspace navigation">
+          <p class="navigation-label">YOUR WORKSPACE</p>
+          <a
+            class="navigation-link is-current"
+            href="#home"
+            data-section="home-view"
+            aria-label="Convert files"
+            aria-current="location"
+            ><svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m3 11 9-8 9 8M5 10v11h14V10M9 21v-7h6v7" /></svg
+            ><span>Convert files</span></a
+          >
+          <a
+            class="navigation-link"
+            href="#settings-title"
+            data-section="settings-title"
+            aria-label="Output settings"
+            ><svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 6h16M4 12h16M4 18h16M8 3v6M16 9v6M10 15v6" /></svg
+            ><span>Output settings</span></a
+          >
+          <p class="navigation-label navigation-label-results">YOUR FILES</p>
+          <a
+            class="navigation-link"
+            href="#activity"
+            data-section="activity"
+            aria-label="Recent batches"
+            ><svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 5h16v14H4zM4 9h16M9 9v10" /></svg
+            ><span>Recent batches</span></a
+          >
+          <a
+            id="preview-navigation-link"
+            class="navigation-link"
+            href="#preview-section"
+            data-section="preview-section"
+            aria-label="Preview and export images"
+            aria-disabled="true"
+            ><svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <path d="M17.5 13v8M14 17.5l3.5 3.5 3.5-3.5" /></svg
+            ><span>Output preview</span></a
+          >
+        </nav>
+      </div>
+      <div class="navigation-footer">
+        <span class="offline-stamp"
+          ><span class="status-dot"></span><span>LOCAL PROCESSING</span></span
+        >
+        <p>Your computer does the work.<br />Your originals stay untouched.</p>
+        <a
+          class="navigation-help"
+          href="#privacy-note"
+          aria-label="About local processing"
+          ><svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6z" />
+            <path d="m8 12 3 3 5-6" /></svg
+          ><span>Private by design</span></a
+        >
+      </div>
+    </aside>
+    <main id="main">
+      <section id="home-view" aria-labelledby="home-title">
+        <div class="hero home-hero">
+          <p class="eyebrow">A LITTLE LESS FRICTION. A LOT MORE POSSIBILITY.</p>
+          <h1 id="home-title">
+            Your files. <br />
+            <span class="hero-accent">Converted locally.</span>
+          </h1>
+          <p class="hero-copy">
+            Convert documents and RAW photos privately on your computer.
+          </p>
+          <div class="hero-facts">
+            <span>◎ Private by design</span><span>⌁ Works offline</span
+            ><span>↗ Originals untouched</span>
+          </div>
+          <span class="hero-page-number" aria-hidden="true">CC / 01</span>
+        </div>
+        <div class="home-section-heading">
+          <div>
+            <p class="eyebrow">PICK YOUR NEXT STEP</p>
+            <h2>What do you want to convert?</h2>
+          </div>
+          <span class="quiet">Documents, RAW and everyday images.</span>
+        </div>
+        <form
+          id="conversion-picker"
+          class="card conversion-picker"
+          aria-labelledby="picker-title"
+        >
+          <h3 id="picker-title">Choose file types</h3>
+          <div class="picker-fields">
+            <div class="field">
+              <label for="picker-input">Input file type</label
+              ><select
+                id="picker-input"
+                aria-describedby="picker-status"
+                disabled
+              >
+                <option value="">Choose input type</option>
+              </select>
+            </div>
+            <span class="picker-arrow" aria-hidden="true">→</span>
+            <div class="field">
+              <label for="picker-output">Output file type</label
+              ><select
+                id="picker-output"
+                aria-describedby="picker-status"
+                disabled
+              >
+                <option value="">Choose output type</option>
+              </select>
+            </div>
+          </div>
+          <p id="picker-status" role="status" aria-live="polite">
+            Loading supported conversions…
+          </p>
+          <button
+            id="picker-retry"
+            class="button secondary"
+            type="button"
+            hidden
+          >
+            Retry
+          </button>
+          <button
+            id="open-converter"
+            class="button primary"
+            type="submit"
+            disabled
+          >
+            Open converter
+          </button>
+          <p class="field-hint">Local processing · Originals untouched</p>
+        </form>
+        <div id="home-privacy-note" class="home-privacy-note">
+          <span class="note-symbol" aria-hidden="true">◎</span>
+          <p>
+            <strong>Your files stay with you.</strong> Your computer handles
+            every conversion. Your original files stay untouched.
+          </p>
+        </div>
+      </section>
+      <section
+        id="pair-panel"
+        class="pair-panel card"
+        hidden
+        aria-labelledby="pair-title"
+      >
+        <div>
+          <p class="eyebrow">ONE QUICK CONNECTION</p>
+          <h2 id="pair-title">Pair this browser</h2>
+          <p>
+            Enter the pairing code from the host computer's console. On
+            localhost, open the fresh launch link. The host computer does all
+            conversions.
+          </p>
+        </div>
+        <form id="pair-form">
+          <label for="pair-code">Pairing code</label>
+          <div class="pair-controls">
+            <input
+              id="pair-code"
+              name="credential"
+              type="password"
+              autocomplete="off"
+              required
+              maxlength="256"
+            /><button class="button primary" type="submit">
+              Connect browser ↗
+            </button>
+          </div>
+          <p id="pair-error" class="error-text" role="alert"></p>
+        </form>
+      </section>
+      <div id="notice" class="notice" role="alert" hidden></div>
+      <div id="converter-view" hidden>
+        <section class="hero converter-hero" aria-labelledby="converter-title">
+          <a class="workspace-back" href="#home">← All converters</a>
+          <p class="eyebrow">YOUR LOCAL CONVERSION WORKSPACE</p>
+          <h1 id="converter-title">CR3 → JPG</h1>
+          <p id="converter-description" class="hero-copy">
+            Develop Canon CR3 photos at full resolution, individually or in a
+            ZIP.
+          </p>
+          <div id="converter-limitations" class="converter-limitations"></div>
+          <p
+            id="converter-availability"
+            class="converter-availability"
+            role="status"
+            hidden
+          ></p>
+        </section>
+        <div class="workspace-grid" id="converter" aria-busy="true">
+          <section aria-labelledby="input-title">
+            <div class="section-heading">
+              <h2 id="input-title">
+                <span class="step-number">01</span>
+                <span id="input-heading-copy">Add your photos</span>
+              </h2>
+              <span id="input-types" class="quiet">CR3 &amp; ZIP</span>
+            </div>
+            <div class="card upload-card">
+              <div class="card-heading">
+                <span class="paper-label">SOURCE FILES</span>
+                <h3 id="input-card-title">Bring your photos in</h3>
+              </div>
+              <input
+                id="file-input"
+                type="file"
+                accept=".cr3,.CR3,.zip,.ZIP"
+                multiple
+                hidden
+              />
+              <button
+                id="drop-zone"
+                class="drop-zone"
+                type="button"
+                disabled
+                aria-label="Choose CR3 photos or ZIP archives"
+              >
+                <span class="upload-symbol" aria-hidden="true">↑</span
+                ><span id="drop-title" class="drop-title"
+                  >Good photos start here.</span
+                ><span id="drop-copy" class="drop-copy"
+                  >Drop CR3 photos or ZIP archives</span
+                ><span class="browse-chip">Browse files ↗</span
+                ><span class="drop-hint" id="upload-limits"
+                  >Multiple files. Nested folders. All welcome.</span
+                >
+              </button>
+              <div id="selection" class="selection" hidden>
+                <div class="selection-heading">
+                  <span id="selection-count"></span
+                  ><button id="clear-files" class="text-button" type="button">
+                    Clear all
+                  </button>
+                </div>
+                <ul
+                  id="selected-files"
+                  class="file-list"
+                  aria-label="Selected inputs"
+                ></ul>
+              </div>
+              <p class="privacy-note">
+                ◎ Files stay in the host computer's private workspace. Originals
+                stay untouched.
+              </p>
+            </div>
+            <div id="privacy-note" class="host-note">
+              <span class="note-symbol" aria-hidden="true">i</span>
+              <p>
+                <strong>Your computer does the work.</strong> Using a phone?
+                Keep the host awake and on the same private Wi-Fi. Your browser
+                uploads and downloads; the host handles the heavy lifting.
+              </p>
+            </div>
+          </section>
+          <aside aria-labelledby="settings-title">
+            <div class="section-heading">
+              <h2 id="settings-title">
+                <span class="step-number">02</span> Make it yours
+              </h2>
+              <span id="settings-output-label" class="quiet">JPEG OUTPUT</span>
+            </div>
+            <form id="settings-form" class="card settings-card">
+              <div class="card-heading">
+                <span class="paper-label">OUTPUT PREFERENCES</span>
+                <h3 id="settings-card-title">JPEG settings</h3>
+              </div>
+              <fieldset id="settings-fields" disabled>
+                <div id="jpeg-quality-settings">
+                  <div class="quality-label">
+                    <label for="quality">JPEG quality</label
+                    ><output id="quality-value" for="quality">95</output>
+                  </div>
+                  <input
+                    id="quality"
+                    name="jpeg_quality"
+                    type="range"
+                    min="70"
+                    max="100"
+                    value="95"
+                  />
+                  <div class="range-labels">
+                    <span>Smaller files</span><span>More detail</span>
+                  </div>
+                </div>
+                <div id="raster-settings" hidden>
+                  <div class="field">
+                    <label for="raster-preset">Compression preset</label
+                    ><select id="raster-preset">
+                      <option value="smaller">Smaller</option>
+                      <option value="balanced" selected>Balanced</option>
+                      <option value="high">High quality</option>
+                    </select>
+                  </div>
+                  <p class="field-hint">
+                    Presets never resize. Lossy recompression cannot restore
+                    detail.
+                  </p>
+                  <div class="field">
+                    <label for="max-width">Maximum width (optional)</label
+                    ><input
+                      id="max-width"
+                      type="number"
+                      min="1"
+                      max="32768"
+                      placeholder="Keep width"
+                    />
+                  </div>
+                  <div class="field">
+                    <label for="max-height">Maximum height (optional)</label
+                    ><input
+                      id="max-height"
+                      type="number"
+                      min="1"
+                      max="32768"
+                      placeholder="Keep height"
+                    />
+                  </div>
+                  <p class="field-hint">
+                    Aspect ratio kept. No upscaling. Orientation normalized
+                    first.
+                  </p>
+                  <details>
+                    <summary>Advanced compression</summary>
+                    <div class="field" id="raster-jpeg-setting">
+                      <label for="raster-jpeg-quality"
+                        >Quality override for JPEG (70–100)</label
+                      ><input
+                        id="raster-jpeg-quality"
+                        type="number"
+                        min="70"
+                        max="100"
+                        placeholder="Use preset"
+                      />
+                    </div>
+                    <div id="raster-webp-setting">
+                      <div class="field">
+                        <label for="webp-quality"
+                          >WebP quality override (1–100)</label
+                        ><input
+                          id="webp-quality"
+                          type="number"
+                          min="1"
+                          max="100"
+                          placeholder="Use preset"
+                        />
+                      </div>
+                      <label
+                        ><input id="webp-lossless" type="checkbox" /> Lossless
+                        WebP (normalized pixels)</label
+                      >
+                    </div>
+                    <div class="field" id="raster-png-setting">
+                      <label for="png-compression"
+                        >PNG compression effort (0 faster–9 smaller)</label
+                      ><input
+                        id="png-compression"
+                        type="number"
+                        min="0"
+                        max="9"
+                        placeholder="Use preset"
+                      />
+                    </div>
+                  </details>
+                  <div class="field" id="raster-background-setting">
+                    <label for="raster-background"
+                      >JPEG background for transparency</label
+                    ><input
+                      id="raster-background"
+                      type="color"
+                      value="#ffffff"
+                    />
+                    <p class="field-hint">
+                      Transparent pixels blend onto this colour.
+                    </p>
+                  </div>
+                  <p class="field-hint">
+                    PNG and WebP preserve alpha. Capture metadata uses a
+                    whitelist; GPS stays opt-in.
+                  </p>
+                </div>
+                <div id="white-balance-setting" class="field">
+                  <label for="white-balance">White balance</label
+                  ><select id="white-balance" name="white_balance">
+                    <option value="camera">As shot · camera</option>
+                    <option value="auto">Automatic</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="suffix"
+                    >Filename suffix <span class="quiet">optional</span></label
+                  ><input
+                    id="suffix"
+                    name="filename_suffix"
+                    placeholder="e.g. _developed"
+                    maxlength="40"
+                    autocomplete="off"
+                  />
+                  <p class="field-hint">
+                    Original names and archive folders are preserved.
+                  </p>
+                </div>
+                <div class="field">
+                  <label for="concurrency">Process at once</label
+                  ><select id="concurrency" name="concurrency">
+                    <option value="1">1 photo · lower memory</option>
+                    <option value="2">2 photos · more memory</option>
+                  </select>
+                </div>
+                <div id="raw-metadata-settings">
+                  <div class="setting-divider"></div>
+                  <label class="check-row" for="metadata"
+                    ><input
+                      id="metadata"
+                      name="preserve_metadata"
+                      type="checkbox"
+                      checked
+                    /><span
+                      >Keep photo metadata<span
+                        id="metadata-hint"
+                        class="field-hint"
+                        >Supported capture and camera details.</span
+                      ></span
+                    ></label
+                  ><label class="check-row" for="gps"
+                    ><input id="gps" name="include_gps" type="checkbox" /><span
+                      >Include GPS location<span class="field-hint"
+                        >Only when available. Off by default.</span
+                      ></span
+                    ></label
+                  >
+                </div>
+              </fieldset>
+              <button
+                id="start-button"
+                class="button primary convert-button"
+                type="submit"
+                disabled
+              >
+                <span id="start-label">Convert to JPEG</span
+                ><span aria-hidden="true">↗</span>
+              </button>
+              <p id="settings-footnote" class="settings-footnote">
+                Full visible size · sRGB · 4:4:4 color
+              </p>
+            </form>
+          </aside>
+        </div>
+        <section
+          id="activity"
+          class="activity-section"
+          aria-labelledby="activity-title"
+        >
+          <div class="section-heading">
+            <h2 id="activity-title">
+              <span class="step-number">03</span> Your conversions
+            </h2>
+            <button
+              id="refresh-history"
+              class="text-button"
+              type="button"
+              disabled
+            >
+              Refresh batches ↻
+            </button>
+          </div>
+          <div class="activity-grid">
+            <aside class="card history-card" aria-label="Recent batches">
+              <p class="eyebrow">RECENT BATCHES</p>
+              <div id="job-history">
+                <p class="empty-history">
+                  A fresh start. Your batches will appear here.
+                </p>
+              </div>
+              <button
+                id="more-history"
+                class="text-button"
+                type="button"
+                hidden
+              >
+                Load more batches
+              </button>
+            </aside>
+            <div class="card results-card">
+              <div id="empty-results" class="empty-results">
+                <span class="empty-symbol" aria-hidden="true">✳</span>
+                <h3>Room for your next batch.</h3>
+                <p>Choose your files and settings, then start a conversion.</p>
+              </div>
+              <section id="job-panel" hidden aria-label="Current batch">
+                <div class="job-heading">
+                  <div>
+                    <p class="eyebrow" id="job-label">CURRENT BATCH</p>
+                    <h3 id="job-state">Ready</h3>
+                  </div>
+                  <span id="job-badge" class="state-badge">Queued</span>
+                </div>
+                <p
+                  id="job-detail"
+                  class="quiet"
+                  aria-live="polite"
+                  aria-atomic="true"
+                ></p>
+                <progress
+                  id="job-progress"
+                  aria-label="Completed files"
+                ></progress>
+                <p id="upload-detail" class="field-hint"></p>
+                <div id="job-warnings" class="job-warnings"></div>
+                <div class="job-actions">
+                  <a
+                    id="review-previews"
+                    class="button secondary"
+                    href="#preview-section"
+                    hidden
+                    >Preview &amp; choose JPGs</a
+                  >
+                  <button
+                    id="cancel-button"
+                    class="button secondary"
+                    type="button"
+                    hidden
+                  >
+                    Cancel batch</button
+                  ><a id="download-primary" class="button primary" hidden
+                    >Download result</a
+                  ><a id="download-all" class="button primary" hidden
+                    >Download all as ZIP</a
+                  ><a id="download-report" class="button secondary" hidden
+                    >Conversion report ↓</a
+                  ><button
+                    id="retry-button"
+                    class="button secondary"
+                    type="button"
+                    hidden
+                  >
+                    Retry retained inputs</button
+                  ><button
+                    id="delete-job"
+                    class="text-button danger"
+                    type="button"
+                    hidden
+                  >
+                    Delete batch
+                  </button>
+                </div>
+                <p id="job-expiry" class="field-hint"></p>
+                <ul
+                  id="result-files"
+                  class="file-list results-list"
+                  aria-label="Conversion results"
+                ></ul>
+              </section>
+            </div>
+          </div>
+        </section>
+        <section
+          id="preview-section"
+          class="preview-section"
+          aria-labelledby="preview-title"
+          hidden
+        >
+          <div class="section-heading">
+            <h2 id="preview-title">
+              <span class="step-number">04</span> Output preview
+            </h2>
+            <span id="preview-count" class="quiet">0 results ready</span>
+          </div>
+          <div class="card preview-card">
+            <div class="preview-toolbar">
+              <div>
+                <h3>Review your converted results.</h3>
+                <p id="preview-intro-copy" class="field-hint">
+                  Photos are developed on your computer first. Review previews,
+                  then choose which full-resolution JPGs to download.
+                </p>
+              </div>
+              <div class="preview-selection-actions">
+                <button
+                  id="select-all-previews"
+                  class="button secondary"
+                  type="button"
+                  disabled
+                >
+                  Select all
+                </button>
+                <button
+                  id="clear-preview-selection"
+                  class="button secondary"
+                  type="button"
+                  disabled
+                >
+                  Clear selection
+                </button>
+              </div>
+            </div>
+            <p id="preview-empty" class="preview-empty">
+              Previews appear here as conversions finish. Failed and skipped
+              inputs cannot be selected for export.
+            </p>
+            <div id="preview-layout" class="preview-layout" hidden>
+              <div class="preview-viewer">
+                <figure class="preview-figure">
+                  <div class="preview-image-stage">
+                    <div id="docx-content" class="docx-content" hidden></div>
+                    <img id="active-preview" alt="" decoding="async" hidden />
+                    <p
+                      id="preview-message"
+                      class="preview-message"
+                      role="status"
+                    ></p>
+                  </div>
+                  <figcaption>
+                    <a id="preview-download" class="button secondary"
+                      >Download</a
+                    >
+                    <div id="pdf-preview-controls" hidden>
+                      <button
+                        id="pdf-previous"
+                        class="button secondary"
+                        type="button"
+                      >
+                        Previous PDF page</button
+                      ><span id="pdf-page-status" role="status"></span
+                      ><button
+                        id="pdf-next"
+                        class="button secondary"
+                        type="button"
+                      >
+                        Next PDF page
+                      </button>
+                    </div>
+                    <p id="preview-filename" class="file-name"></p>
+                    <p id="preview-dimensions" class="field-hint"></p>
+                  </figcaption>
+                </figure>
+                <div class="preview-viewer-controls">
+                  <button
+                    id="previous-preview"
+                    class="icon-button"
+                    type="button"
+                    aria-label="Previous preview"
+                  >
+                    ←
+                  </button>
+                  <span id="preview-position" class="quiet"></span>
+                  <button
+                    id="next-preview"
+                    class="icon-button"
+                    type="button"
+                    aria-label="Next preview"
+                  >
+                    →
+                  </button>
+                  <label class="preview-current-selection"
+                    ><input id="select-viewed-photo" type="checkbox" />Include
+                    viewed result in export</label
+                  >
+                </div>
+              </div>
+              <div class="preview-catalog">
+                <div
+                  id="preview-grid"
+                  class="preview-grid"
+                  aria-label="Result previews"
+                ></div>
+                <nav class="preview-pagination" aria-label="Preview pages">
+                  <button
+                    id="previous-preview-page"
+                    class="button secondary"
+                    type="button"
+                  >
+                    Previous page</button
+                  ><span id="preview-page" class="quiet"></span
+                  ><button
+                    id="next-preview-page"
+                    class="button secondary"
+                    type="button"
+                  >
+                    Next page
+                  </button>
+                </nav>
+              </div>
+            </div>
+            <div class="preview-export-bar">
+              <div>
+                <p
+                  id="export-selection-count"
+                  class="selection-count"
+                  role="status"
+                  aria-live="polite"
+                >
+                  0 of 0 results selected
+                </p>
+                <p id="preview-export-hint" class="field-hint">
+                  One photo downloads as JPG. Multiple photos download in a ZIP,
+                  with folders preserved.
+                </p>
+                <p
+                  id="export-status"
+                  class="field-hint"
+                  role="status"
+                  aria-live="polite"
+                ></p>
+              </div>
+              <button
+                id="export-selected"
+                class="button primary"
+                type="button"
+                disabled
+              >
+                Export selected JPGs ↓
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+      <footer>
+        <span
+          >CapreConvert.
+          <span class="quiet">Small tool. Full-sized possibilities.</span></span
+        ><span id="versions" class="quiet"
+          >Local processing. No cloud required.</span
+        >
+      </footer>
+    </main>
+  </body>
+</html>

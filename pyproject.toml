@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=80,<83"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "localraw-converter"
+dynamic = ["version"]
+description = "CapreConvert: private local document and RAW image conversion"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+  "fastapi>=0.120,<1", "uvicorn>=0.38,<1", "pydantic>=2.12,<3",
+  "rawpy==0.27.1", "Pillow>=12,<13", "numpy>=2.3,<3", "psutil>=7.1,<8",
+  "pypdf>=6,<7", "python-docx>=1.2,<2", "pypdfium2>=5,<6"
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.4,<10", "httpx==0.28.1", "playwright>=1.56,<2", "pyinstaller>=6.16,<7", "ruff>=0.14,<1"]
+
+[project.scripts]
+localraw = "localraw.__main__:main"
+capreconvert = "localraw.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["localraw*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "localraw.__version__"}
+
+[tool.setuptools.package-data]
+localraw = ["static/*", "static/assets/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["e2e: requires installed Playwright Chromium", "real: requires licensed CR3 fixtures"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 105
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "B", "UP"]
+
