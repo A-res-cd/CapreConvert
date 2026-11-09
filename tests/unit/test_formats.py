@@ -18,7 +18,7 @@ def test_legacy_requests_keep_jpeg_defaults_and_settings():
 def test_format_contract_accepts_only_the_documented_modes(key):
     settings = ConversionSettings(conversion=key)
     spec = format_for(settings)
-    assert spec.output_extension in {".jpg", ".png", ".webp", ".pdf", ".docx"}
+    assert spec.output_extension in {".jpg", ".png", ".webp", ".pdf", ".docx", ".odt"}
     assert spec.is_raw == key.startswith("cr3_")
     with pytest.raises(ValidationError):
         ConversionSettings(conversion="../../output")

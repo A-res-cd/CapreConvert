@@ -10,8 +10,9 @@ CapreConvert converts documents, Canon RAW photos and everyday image files on yo
 | PNG | JPG, WebP, or an optimized PNG |
 | WebP | JPG, PNG, or an optimized WebP |
 | Canon CR3 | JPG or PNG |
-| DOCX | PDF, using a local LibreOffice installation |
-| PDF | DOCX, using selectable text from the PDF |
+| DOCX | PDF or ODT, using local LibreOffice |
+| ODF Text (.odt) | DOCX or PDF, using local LibreOffice |
+| PDF | DOCX, or ODT with local LibreOffice; selectable text only |
 
 Image conversions include resizing, compression presets, transparency controls and metadata options. Resizing keeps the aspect ratio and does not upscale. The results show file sizes, dimensions and whether the output is smaller or larger.
 
@@ -19,27 +20,27 @@ CR3 conversions also accept ZIP archives containing CR3 files. For other formats
 
 ## Run the Windows build
 
-1. Extract `CapreConvert-v1.0.0-windows-x64.zip`.
+1. Extract `CapreConvert-v1.1.0-windows-x64.zip`.
 2. Keep the extracted folder together, including `_internal`.
-3. Run `CapreConvert-v1.0.0.exe`.
+3. Run `CapreConvert-v1.1.0.exe`.
 
 The app opens in your browser. Python is included in the Windows build, so a separate Python installation is not needed. Close an older instance before starting another copy with the same workspace.
 
-### DOCX to PDF
+### LibreOffice document conversions
 
-Install [LibreOffice](https://www.libreoffice.org/download/) on the computer running CapreConvert, then restart the app. LibreOffice and its installer are not included in the current package. All other conversions work without it.
+Install [LibreOffice](https://www.libreoffice.org/download/) on the computer running CapreConvert, then restart the app. LibreOffice and its installer are not included in the current package. ODT conversions and DOCX to PDF need it. PDF to DOCX and image conversions work without it.
 
 If LibreOffice is installed somewhere the app cannot find, pass its executable path:
 
 ```powershell
-.\CapreConvert-v1.0.0.exe --libreoffice "C:\Program Files\LibreOffice\program\soffice.com"
+.\CapreConvert-v1.1.0.exe --libreoffice "C:\Program Files\LibreOffice\program\soffice.com"
 ```
 
 ## Using the app
 
 Choose an input file type and an output file type, then click **Open converter**. Add files, adjust the settings and start the batch. Successful results remain available if another file fails or you cancel the remaining work.
 
-The **Output preview** panel shows converted images, PDF pages or read-only DOCX text and tables. Image previews are reduced in size; DOCX previews do not reproduce Word's page layout.
+The **Output preview** panel shows converted images, PDF pages or read-only DOCX text and tables, or ODT text. Image previews are reduced in size; document text previews do not reproduce exact page layout.
 
 Use **Download** for an individual result. Selecting one result downloads that file directly; selecting several creates a ZIP. **Download all as ZIP** includes every successful result in the batch. Downloads still work when a preview is unavailable.
 
@@ -60,8 +61,8 @@ The existing `localraw` command also works. Settings can be supplied through `--
 
 ## Limitations
 
-- PDF to DOCX extracts text. It does not perform OCR or preserve images, tables, fonts or the original page layout.
-- DOCX to PDF depends on the fonts installed on the host. Documents with encrypted, active, embedded or externally linked content may be rejected.
+- PDF to DOCX or ODT extracts text. It does not perform OCR or preserve images, tables, fonts or the original page layout.
+- LibreOffice conversions depend on the fonts installed on the host. Documents with encrypted, active, embedded or externally linked content may be rejected.
 - Image conversions support static JPEG, PNG and WebP files. Animated images and other image formats are not supported.
 - Recompressing an image cannot restore lost detail or guarantee a smaller file. PNG and lossless WebP preserve the normalized output pixels, rather than the original file bytes.
 - CR3 support varies by camera and recording mode. RAW capture metadata uses optional ExifTool support. GPS metadata is off by default.

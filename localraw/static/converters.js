@@ -47,6 +47,24 @@ export const converters = {
 };
 
 const presentation = { ...converters };
+for (const [source, target] of [
+  ["odt", "docx"],
+  ["docx", "odt"],
+  ["odt", "pdf"],
+  ["pdf", "odt"],
+]) {
+  presentation[`${source}_to_${target}`] = {
+    description:
+      source === "pdf"
+        ? "Extract selectable PDF text into an editable ODF Text document."
+        : `Convert ${source.toUpperCase()} documents to ${target.toUpperCase()} with local LibreOffice.`,
+    completed: `Your ${target.toUpperCase()} documents are ready.`,
+    footnote:
+      source === "pdf"
+        ? "Text extraction only · no OCR or original page layout"
+        : "Local LibreOffice conversion · originals untouched",
+  };
+}
 let advertised = null;
 const validID = /^[a-z][a-z0-9_]{0,63}$/;
 export function configureConverters(capabilities) {
@@ -68,9 +86,11 @@ export function configureConverters(capabilities) {
     const output = target.short_label || target.label;
     converters[entry.id] = {
       description: "Convert files locally with the settings below.",
-      completed: `Your ${output.toUpperCase()} images are ready.`,
+      completed: `Your ${output.toUpperCase()} ${source.category === "documents" ? "documents" : "images"} are ready.`,
       footnote:
-        "sRGB normalized pixels. Lossy recompression cannot restore detail.",
+        source.category === "documents"
+          ? "Local document conversion · originals untouched"
+          : "sRGB normalized pixels. Lossy recompression cannot restore detail.",
       source: source.short_label || source.label,
       output: output.toUpperCase(),
       ...presentation[entry.id],

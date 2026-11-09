@@ -81,7 +81,7 @@ def capabilities(request: Request):
     office_available = bool(libreoffice_executable(settings.libreoffice))
     conversions = []
     for descriptor in CONVERSIONS.values():
-        available = descriptor.id != "docx_to_pdf" or office_available
+        available = descriptor.engine != "document" or descriptor.id == "pdf_to_docx" or office_available
         conversions.append(
             {
                 **asdict(descriptor),
@@ -98,7 +98,7 @@ def capabilities(request: Request):
                 "limitations": [
                     "Text-based PDFs only; no OCR. Paragraphs are editable; complex layouts may change."
                 ]
-                if descriptor.id == "pdf_to_docx"
+                if descriptor.source_format == "pdf"
                 else [],
             }
         )

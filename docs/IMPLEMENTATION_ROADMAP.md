@@ -1,6 +1,15 @@
 # Ordered implementation
 
-Current work: CapreConvert v1.0.0. Follow V1_0_PLAN.md for the picker, regression, packaging
+Current work: CapreConvert v1.1.0. Follow V1_1_PLAN.md in order for ODT support and release checks.
+
+v1.1.0 gates 1–5 complete: four ODT document routes, bounded package validation,
+protected text previews, capability picker/export integration, native/source/browser checks
+and versioned Windows build. Source215 pass/1 camera-fixture skip; focused later22 pass
+(overlapping); browser27 pass. Native frozen smoke and browser checks passed with the
+document512 test profile and unchanged reserve/defaults. CRC/SHA verified; v1.0.0 retained.
+Commands, artifact hash and default-policy/broader acceptance limits: V1_1_VALIDATION.md.
+
+Previous work: CapreConvert v1.0.0. Follow V1_0_PLAN.md for the picker, regression, packaging
 and explicitly authorized old-release cleanup gates. v0.4.0 work below is historical.
 
 Previous release: CapreConvert v0.4.0. Follow [V0_4_PLAN.md](V0_4_PLAN.md), gates A-J:

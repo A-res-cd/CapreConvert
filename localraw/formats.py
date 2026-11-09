@@ -8,6 +8,10 @@ ConversionKind = Literal[
     "cr3_to_png",
     "docx_to_pdf",
     "pdf_to_docx",
+    "odt_to_docx",
+    "docx_to_odt",
+    "odt_to_pdf",
+    "pdf_to_odt",
     "jpg_to_png",
     "png_to_jpg",
     "jpg_to_webp",
@@ -41,6 +45,7 @@ class ConversionFormat:
 
 
 FORMATS = {
+    "odt": {"id": "odt", "label": "ODF Text (.odt)", "short_label": "ODT", "category": "documents"},
     "jpg": {"id": "jpg", "label": "JPG / JPEG", "short_label": "JPG", "category": "images"},
     "png": {"id": "png", "label": "PNG", "short_label": "PNG", "category": "images"},
     "webp": {"id": "webp", "label": "WebP", "short_label": "WebP", "category": "images"},
@@ -80,6 +85,26 @@ for key, source_id, target_id in (
     ("pdf_to_docx", "pdf", "docx"),
 ):
     CONVERSIONS[key] = replace(CONVERSIONS[key], source_format=source_id, target_format=target_id)
+
+
+for source, target in (("odt", "docx"), ("docx", "odt"), ("odt", "pdf"), ("pdf", "odt")):
+    key = f"{source}_to_{target}"
+    CONVERSIONS[key] = ConversionFormat(
+        key,
+        f"{source.upper()} → {target.upper()}",
+        (f".{source}",),
+        f".{target}",
+        {
+            "odt": "application/vnd.oasis.opendocument.text",
+            "pdf": "application/pdf",
+            "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        }[target],
+        False,
+        "document",
+        target,
+        source_format=source,
+        target_format=target,
+    )
 
 
 for source, target in (

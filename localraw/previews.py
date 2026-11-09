@@ -19,7 +19,7 @@ PREVIEW_REVISION = "v0.4-preview-1"
 
 
 def cache_identity(item, kind, page, settings):
-    renderer = "pypdfium2" if kind == "pdf" else "lxml" if kind == "docx" else "Pillow"
+    renderer = "pypdfium2" if kind == "pdf" else "lxml" if kind in {"docx", "odt"} else "Pillow"
     options = {
         key: value
         for key, value in settings.model_dump(mode="json").items()
@@ -92,6 +92,35 @@ def render_worker(source, target, kind, page, limits, connection):
                 "width": dimensions[0],
                 "height": dimensions[1],
             }
+        elif kind == "odt":
+            import zipfile
+
+            from .documents import _validate_odt, _xml_root
+
+            _validate_odt(path, limits, lambda: False, generated=True)
+            with zipfile.ZipFile(path) as archive:
+                root = _xml_root(archive.read("content.xml"))
+            namespace = "{urn:oasis:names:tc:opendocument:xmlns:text:1.0}"
+            blocks, remaining = [], limits["preview_text_characters"]
+            truncated = False
+            for paragraph in root.iter():
+                if paragraph.tag not in {namespace + "p", namespace + "h"}:
+                    continue
+                if remaining <= 0 or len(blocks) >= 500:
+                    truncated = True
+                    break
+                value = "".join(paragraph.itertext())
+                truncated = truncated or len(value) > remaining
+                value = value[:remaining]
+                remaining -= len(value)
+                blocks.append({"type": "paragraph", "text": value})
+            details = {
+                "kind": "odt",
+                "blocks": blocks,
+                "truncated": truncated,
+                "notice": "Read-only ODT text preview; not exact document page layout.",
+            }
+            part.write_text(json.dumps(details, ensure_ascii=True), encoding="utf-8")
         elif kind == "docx":
             import zipfile
 
@@ -217,7 +246,9 @@ def prepare(jobs, job, item, page=1):
                 )
             acquired = jobs.execution_lock.acquire(timeout=0.1)
         identity = cache_identity(item, kind, page, settings)
-        target = jobs.directory(job) / ("pv-" + identity + (".json" if kind == "docx" else ".png"))
+        target = jobs.directory(job) / (
+            "pv-" + identity + (".json" if kind in {"docx", "odt"} else ".png")
+        )
         sidecar = target.with_suffix(target.suffix + ".meta")
         if (
             target.is_file()

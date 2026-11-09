@@ -6,22 +6,22 @@ Build each distribution on its target OS. From the project root on Windows:
 .\.venv\Scripts\python.exe scripts/build-package.py
 ```
 
-The version comes from `localraw/__init__.py` (`__version__ = "1.0.0"`). The builder
+The version comes from `localraw/__init__.py` (`__version__ = "1.1.0"`). The builder
 adds the `v` prefix automatically. Set a new version there before the next release;
 Python project metadata, executable name, folder and ZIP use the same value.
 Versions such as `0.2.0rc1` are also supported. There is no cross-compilation.
 
-For version 1.0.0 on Windows x64, this produces:
+For version 1.1.0 on Windows x64, this produces:
 
 ```text
 dist/
-  v1.0.0/
-    CapreConvert-v1.0.0.exe
+  v1.1.0/
+    CapreConvert-v1.1.0.exe
     _internal/
     release.json
     START_HERE.txt
-  CapreConvert-v1.0.0-windows-x64.zip
-  CapreConvert-v1.0.0-windows-x64.zip.sha256
+  CapreConvert-v1.1.0-windows-x64.zip
+  CapreConvert-v1.1.0-windows-x64.zip.sha256
 ```
 
 The command builds in a temporary staging folder, smoke-checks the executable, creates
@@ -33,11 +33,11 @@ A per-version lock prevents concurrent builds into the same output directory.
 Send the ZIP and its checksum together. Extract the ZIP before launching:
 
 ```powershell
-.\dist\v1.0.0\CapreConvert-v1.0.0.exe
-.\dist\v1.0.0\CapreConvert-v1.0.0.exe --lan
+.\dist\v1.1.0\CapreConvert-v1.1.0.exe
+.\dist\v1.1.0\CapreConvert-v1.1.0.exe --lan
 ```
 
-Keep the entire `v1.0.0/` folder. `_internal` holds Python, native libraries,
+Keep the entire `v1.1.0/` folder. `_internal` holds Python, native libraries,
 static assets, distribution metadata and upstream licenses. The end user needs no installed
 Python. Workspace data is separate and survives replacing the application folder.
 Finish jobs and close an older instance before starting a new version with the same
@@ -51,7 +51,7 @@ For a folder-only build or to recheck an existing release:
 .\.venv\Scripts\python.exe scripts/smoke-package.py
 ```
 
-Direct PyInstaller builds use the same `dist/v<version>/LocalRAW-v<version>.exe` naming,
+Direct PyInstaller builds use the same `dist/v<version>/CapreConvert-v<version>.exe` naming,
 but do not create the ZIP, checksum or release manifest. The smoke script accepts
 `--dist-dir PATH` for a different folder, including older unversioned builds.
 
@@ -127,3 +127,10 @@ It does not change packaged defaults or skip native checks. --memory-profile com
 the corresponding smoke-script flag. Record the profile; do not report default-policy
 acceptance from compact validation. Older packages were removed at the user's request
 following the verified v1.0.0 build; historical evidence remains in docs/test-results.
+
+v1.1 adds four ODT conversion routes to the native document smoke. The combined
+PDF-text extraction and LibreOffice pipeline exceeds the old compact 384 MiB test cap.
+`--smoke-memory-profile document512` (smoke/browser flag `--memory-profile document512`)
+uses a 512 MiB document cap and 256 MiB preview cap for tiny validation fixtures, retaining
+the 768 MiB reserve. Packaged defaults remain document 768 MiB / preview 384 MiB.
+Record the selected profile and any default-policy acceptance gap with the release.

@@ -220,7 +220,7 @@ class Jobs:
                             and target.name
                             == "pv-"
                             + identity
-                            + (".json" if descriptor.preview_kind == "docx" else ".png")
+                            + (".json" if descriptor.preview_kind in {"docx", "odt"} else ".png")
                             and target.is_file()
                             and target.stat().st_size <= settings.preview_max_bytes
                             and file_hash(target) == cache["sha256"]

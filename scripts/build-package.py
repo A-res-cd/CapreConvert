@@ -80,7 +80,7 @@ def main():
     )
     parser.add_argument(
         "--smoke-memory-profile",
-        choices=("default", "compact"),
+        choices=("default", "compact", "document512"),
         default="default",
         help="Use stricter worker caps for tiny smoke fixtures without changing packaged defaults or safety reserves",
     )
@@ -156,11 +156,11 @@ def main():
             "Finish current jobs and close an older LocalRAW or CapreConvert instance before launching this copy.\n"
             "Your existing workspace, saved sessions and originals are separate from this application folder.\n"
             "PDF to DOCX uses bundled pypdf/python-docx/lxml and extracts text, without OCR or layout reconstruction.\n"
-            "DOCX to PDF needs a separate local LibreOffice installation; LibreOffice is detected, not bundled.\n"
+            "ODT to DOCX/PDF, DOCX to ODT/PDF, and PDF to ODT need local LibreOffice; it is detected, not bundled.\n"
             "JPEG/PNG/WebP conversion and optimization use bundled local Pillow codecs.\n"
-            "Output previews use local PDFium page rendering and read-only DOCX content.\n"
+            "Output previews use local PDFium page rendering and read-only DOCX/ODT content.\n"
             "One selected output downloads directly; multiple selections download as a ZIP.\n"
-            "Both document routes remain local; no document is uploaded to an Internet service.\n"
+            "All document routes remain local; no document is uploaded to an Internet service.\n"
             "Setup, limits and notices: _internal/README.md and _internal/THIRD_PARTY_NOTICES.md.\n"
             "See validation documentation for executed camera/document checks; smoke alone is not clean-machine validation.\n",
             encoding="utf-8",
@@ -173,8 +173,8 @@ def main():
         # compiler exits. Wait for default test admission; never weaken app limits.
         required_headroom = (
             768
-            + (384 if arguments.smoke_memory_profile == "compact" else 768)
-            + (96 if arguments.smoke_memory_profile == "compact" else 128)
+            + {"compact": 384, "document512": 512, "default": 768}[arguments.smoke_memory_profile]
+            + (128 if arguments.smoke_memory_profile == "default" else 96)
         ) * 1024**2
         deadline = time.monotonic() + 60
         while psutil.virtual_memory().available < required_headroom:

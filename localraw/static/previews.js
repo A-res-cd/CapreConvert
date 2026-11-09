@@ -168,7 +168,7 @@ async function renderViewer() {
       );
     }
     if (gallery !== current || sequence !== previewSequence) return;
-    if (kind === "docx") {
+    if (["docx", "odt"].includes(kind)) {
       const content = await response.json();
       if (gallery !== current || sequence !== previewSequence) return;
       const container = $("docx-content");

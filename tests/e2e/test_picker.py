@@ -22,7 +22,7 @@ def test_groups_filter_aliases_retention_and_single_target(browser, live_server)
     expect(page.locator("#picker-input")).to_have_value("")
     expect(page.locator("#picker-output")).to_be_disabled()
     expect(page.locator("#open-converter")).to_be_disabled()
-    assert set(values(page, "#picker-input")) == {"jpg", "png", "webp", "cr3", "docx", "pdf"}
+    assert set(values(page, "#picker-input")) == {"jpg", "png", "webp", "cr3", "docx", "pdf", "odt"}
     assert page.locator("#picker-input optgroup").evaluate_all("groups => groups.map(g => g.label)") == [
         "Images",
         "Documents",
@@ -34,8 +34,9 @@ def test_groups_filter_aliases_retention_and_single_target(browser, live_server)
         ("png", {"jpg", "png", "webp"}),
         ("webp", {"jpg", "png", "webp"}),
         ("cr3", {"jpg", "png"}),
-        ("pdf", {"docx"}),
-        ("docx", {"pdf"}),
+        ("pdf", {"docx", "odt"}),
+        ("docx", {"pdf", "odt"}),
+        ("odt", {"docx", "pdf"}),
     ]:
         page.locator("#picker-input").select_option(source)
         assert set(values(page, "#picker-output")) == outputs
@@ -46,7 +47,7 @@ def test_groups_filter_aliases_retention_and_single_target(browser, live_server)
     page.locator("#picker-input").select_option("cr3")
     expect(page.locator("#picker-output")).to_have_value("")
     page.locator("#picker-input").select_option("pdf")
-    expect(page.locator("#picker-output")).to_have_value("docx")
+    expect(page.locator("#picker-output")).to_have_value("")
     page.locator("#picker-input").select_option("png")
     page.locator("#picker-output").select_option("png")
     expect(page.locator("#picker-status")).to_have_text("Optimize size, quality or dimensions.")
@@ -178,4 +179,25 @@ def test_picker_mobile_layout_keyboard_and_sidebar(browser, live_server):
     expect(page.locator("#navigation-toggle")).to_be_focused()
     page.get_by_role("link", name="CapreConvert home", exact=True).click()
     page.screenshot(path="test-results/v1-picker-mobile.png", full_page=True)
+    context.close()
+
+
+def test_odt_routes_and_missing_office_setup(browser, live_server, monkeypatch):
+    from localraw import documents
+
+    monkeypatch.setattr(documents, "libreoffice_executable", lambda configured=None: None)
+    app, url = live_server
+    context = browser.new_context()
+    page = context.new_page()
+    open_home(page, app, url)
+    for source, target in (("odt", "docx"), ("docx", "odt"), ("odt", "pdf"), ("pdf", "odt")):
+        page.locator("#picker-input").select_option(source)
+        page.locator("#picker-output").select_option(target)
+        expect(page.locator("#picker-status")).to_contain_text("Install LibreOffice")
+        expect(page.locator("#open-converter")).to_be_disabled()
+        page.goto(url + f"/#convert={source}_to_{target}")
+        expect(page.locator("#converter-title")).to_have_text(f"{source.upper()} → {target.upper()}")
+        expect(page.locator("#drop-zone")).to_be_disabled()
+        page.get_by_role("link", name="CapreConvert home", exact=True).click()
+    assert not app.state.uploads.items
     context.close()

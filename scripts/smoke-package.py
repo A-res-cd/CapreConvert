@@ -162,6 +162,49 @@ def document_smoke(client, conversions):
         )
         assert client.delete(f"/api/v1/jobs/{job_id}").status_code == 204
         result["docx_to_pdf"] = "passed with external LibreOffice"
+        odt_bytes = None
+        for conversion, filename, payload, target in (
+            ("docx_to_odt", "text.docx", converted_docx, "odt"),
+            ("pdf_to_odt", "text.pdf", minimal_pdf(expected), "odt"),
+            ("odt_to_docx", "text.odt", None, "docx"),
+            ("odt_to_pdf", "text.odt", None, "pdf"),
+        ):
+            assert conversions[conversion]["available"]
+            job_id, job = upload_and_run(client, filename, payload or odt_bytes, conversion)
+            assert job["state"] == "completed", client.get(f"/api/v1/jobs/{job_id}/errors").text
+            item = client.get(f"/api/v1/jobs/{job_id}/files").json()["items"][0]
+            route = f"/api/v1/jobs/{job_id}/results/{item['output_id']}"
+            response = client.get(route)
+            assert response.status_code == 200 and item["output_name"].endswith("." + target)
+            assert response.headers["content-type"].startswith(conversions[conversion]["media_type"])
+            if target == "pdf":
+                reader = PdfReader(io.BytesIO(response.content))
+                assert expected in "\n".join(page.extract_text() or "" for page in reader.pages)
+                reader.close()
+            else:
+                with zipfile.ZipFile(io.BytesIO(response.content)) as archive:
+                    assert archive.testzip() is None
+                    assert expected.encode() in archive.read(
+                        "content.xml" if target == "odt" else "word/document.xml"
+                    )
+                if conversion == "docx_to_odt":
+                    odt_bytes = response.content
+            preview_route = f"/api/v1/jobs/{job_id}/output-preview/{item['output_id']}"
+            preview = client.get(preview_route)
+            assert preview.status_code == 200, preview.text
+            if target != "pdf":
+                assert preview.json()["kind"] == target
+                assert any(expected in block.get("text", "") for block in preview.json()["blocks"])
+                assert client.get(preview_route).json()["cached"]
+            cookies = dict(client.cookies)
+            client.cookies.clear()
+            assert client.get(route).status_code == 401
+            assert client.get(preview_route).status_code == 401
+            client.cookies.update(cookies)
+            assert client.delete(f"/api/v1/jobs/{job_id}").status_code == 204
+            result[conversion] = (
+                "passed with external LibreOffice; direct bytes, protected preview and cache verified"
+            )
     return result
 
 
@@ -218,7 +261,7 @@ def main():
     parser.add_argument("--libreoffice", type=Path, help="Explicit external engine for validation only")
     parser.add_argument(
         "--memory-profile",
-        choices=("default", "compact"),
+        choices=("default", "compact", "document512"),
         default="default",
         help="Compact caps document workers at384MiB and previews at256MiB for tiny smoke fixtures; reserves remain unchanged",
     )
@@ -262,8 +305,10 @@ def main():
             engine = arguments.libreoffice.expanduser().resolve()
             assert engine.is_file(), "Configured external LibreOffice executable is missing."
             environment["LOCALRAW_LIBREOFFICE"] = json.dumps(str(engine))
-        if arguments.memory_profile == "compact":
-            environment["LOCALRAW_DOCUMENT_MEMORY_BYTES"] = str(384 * 1024**2)
+        if arguments.memory_profile != "default":
+            environment["LOCALRAW_DOCUMENT_MEMORY_BYTES"] = str(
+                (384 if arguments.memory_profile == "compact" else 512) * 1024**2
+            )
             environment["LOCALRAW_PREVIEW_MEMORY_BYTES"] = str(256 * 1024**2)
         process = subprocess.Popen(
             [

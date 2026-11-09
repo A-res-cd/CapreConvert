@@ -1,6 +1,30 @@
 # CapreConvert implementation handoff
 
-## Current v1.0.0 delivery
+## Current v1.1.0 delivery
+
+ODF Text (.odt) ↔ DOCX and ODT ↔ PDF are available through the capability picker.
+All four pairs need external local LibreOffice. PDF → ODT extracts selectable text through
+the existing PDF → DOCX engine before ODT export; no OCR/layout reconstruction. ODT
+ZIP/XML validation rejects unsafe, active, encrypted and externally linked content in workers.
+ODT text previews and existing protected direct/selected ZIP exports work. Upload extension
+acceptance now follows the registry. Legacy settings/jobs/identities and originals remain.
+
+Source backend215 pass/1 standardized camera-fixture skip; later focused22 pass overlap;
+browser27 pass. Native LibreOffice round trips and all six packaged document routes pass.
+First compact384MiB smoke hit the PDF → ODT worker cap; final document512MiB/preview256MiB
+test profile passes with the768MiB reserve unchanged. Shipped defaults remain768/384MiB.
+Default-profile frozen/clean-machine/broad layout/camera acceptance remains open.
+Real frozen browser ODT content/selected bytes/refresh and old native workflows pass;
+derivatives were generated before Chromium to fit host RAM. No commit, push or publication.
+
+Release: dist/v1.1.0/CapreConvert-v1.1.0.exe with full folder and
+dist/CapreConvert-v1.1.0-windows-x64.zip plus .sha256 (43,250,806bytes;513files).
+SHA-256:aaba781bd78fdb73e583372c10240a4e9f2c01b3f287ec719df3f06326bad9d9.
+Independent CRC/hash and20frozen-module/source comparisons pass. v1.0.0 artifacts remain
+unchanged; no old release/workspace cleanup was requested or performed in this task.
+See V1_1_PLAN.md and V1_1_VALIDATION.md for ordered gates, evidence and limits.
+
+## Previous v1.0.0 delivery
 
 Homepage now has native grouped input/output selects and one Open converter action.
 Explicit normalized source/target IDs and image/document catalog are additive capabilities;

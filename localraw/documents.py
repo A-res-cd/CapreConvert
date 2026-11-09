@@ -340,6 +340,172 @@ def _validate_docx(path, limits, cancelled, *, generated=False):
         raise ConversionError("DOCX is corrupt or not a supported Word document.") from exc
 
 
+def _validate_odt(path, limits, cancelled, *, generated=False):
+    """Read a bounded ODF text package without extracting any member to disk."""
+    from lxml import etree
+
+    office = "urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+    manifest = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
+    maximum = limits["document_expanded_max_bytes"]
+    xml_max = min(maximum, 16 * MiB)
+    try:
+        _guard_directory(
+            path,
+            SimpleNamespace(
+                zip_max_entries=min(limits.get("zip_max_entries", 10_000), 5_000),
+                zip_directory_max_bytes=min(limits.get("zip_directory_max_bytes", 32 * MiB), 8 * MiB),
+            ),
+        )
+        with zipfile.ZipFile(path) as archive:
+            names, roots, expanded = set(), {}, 0
+            for entry in archive.infolist():
+                _check_cancelled(cancelled)
+                name = safe_relative(entry.orig_filename)
+                normalized = canonical(name)
+                if normalized in names:
+                    raise ConversionError("ODT contains duplicate or ambiguous package entries.")
+                names.add(normalized)
+                kind = stat.S_IFMT((entry.external_attr >> 16) & 0xFFFF)
+                if (
+                    kind not in (0, stat.S_IFREG, stat.S_IFDIR)
+                    or entry.flag_bits & 1
+                    or entry.compress_type not in (zipfile.ZIP_STORED, zipfile.ZIP_DEFLATED)
+                ):
+                    raise ConversionError(
+                        "ODT links, encryption and unsupported compression are forbidden."
+                    )
+                if entry.is_dir():
+                    continue
+                if any(part in {"basic", "scripts"} for part in normalized.split("/")):
+                    raise ConversionError("ODT scripts and macro libraries are unsupported.")
+                expanded += entry.file_size
+                if expanded > maximum or (
+                    not generated
+                    and entry.file_size
+                    > max(1000, limits.get("compression_ratio", 200)) * max(1, entry.compress_size)
+                ):
+                    raise ConversionError("ODT expanded content exceeds its configured limit.")
+                if normalized != "mimetype" and not normalized.endswith(
+                    (".xml", ".rdf", ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".tif", ".tiff")
+                ):
+                    raise ConversionError(
+                        "ODT embedded objects, scripts and unsupported resources are forbidden."
+                    )
+                data, count = bytearray(), 0
+                xml = normalized.endswith((".xml", ".rdf"))
+                with archive.open(entry) as stream:
+                    while chunk := stream.read(CHUNK):
+                        _check_cancelled(cancelled)
+                        count += len(chunk)
+                        if count > entry.file_size or count > maximum:
+                            raise ConversionError("ODT member exceeds its declared bounds.")
+                        if count == len(chunk) and chunk.lstrip().startswith(
+                            (b"<", b"\xef\xbb\xbf", b"\xff\xfe", b"\xfe\xff", b"\x00<", b"\x00\x00\x00<")
+                        ):
+                            xml = True
+                        if xml or normalized == "mimetype":
+                            if count > (xml_max if xml else 128):
+                                raise ConversionError("ODT XML part exceeds its byte limit.")
+                            data.extend(chunk)
+                if count != entry.file_size:
+                    raise ConversionError("ODT member size does not match.")
+                if normalized == "mimetype":
+                    if data != b"application/vnd.oasis.opendocument.text":
+                        raise ConversionError("File is not an ODF text (.odt) document.")
+                if not xml:
+                    continue
+                root = _xml_root(bytes(data))
+                roots[normalized] = root.tag
+                if (
+                    normalized == "content.xml"
+                    and root.find(f"{{{office}}}body/{{{office}}}text") is None
+                ):
+                    raise ConversionError("ODT text body is missing.")
+                for element in root.iter():
+                    if not isinstance(element.tag, str):
+                        continue
+                    qualified = etree.QName(element)
+                    local = qualified.localname
+                    if (
+                        local
+                        in {
+                            "script",
+                            "event-listener",
+                            "object",
+                            "object-ole",
+                            "applet",
+                            "plugin",
+                            "frame-source",
+                            "floating-frame",
+                            "dde-connection-decl",
+                            "dde-connection",
+                            "section-source",
+                            "table-source",
+                            "encryption-data",
+                        }
+                        or (local in {"scripts", "forms"} and len(element))
+                        or local.startswith(("database-", "dde-"))
+                        or local == "connection-resource"
+                        or qualified.namespace
+                        in {
+                            "http://www.w3.org/2000/svg",
+                            "urn:oasis:names:tc:opendocument:xmlns:script:1.0",
+                        }
+                    ):
+                        raise ConversionError("ODT active, encrypted or linked content is unsupported.")
+                    if local == "file-entry" and qualified.namespace == manifest:
+                        media = element.get(f"{{{manifest}}}media-type", "")
+                        member = element.get(f"{{{manifest}}}full-path", "")
+                        if member == "/":
+                            if media != "application/vnd.oasis.opendocument.text":
+                                raise ConversionError("ODT manifest document type is invalid.")
+                        else:
+                            safe_relative(member)
+                            configuration = (
+                                media == "application/vnd.sun.xml.ui.configuration"
+                                and member == "Configurations2/"
+                            )
+                            if not configuration and media not in {
+                                "",
+                                "text/xml",
+                                "application/rdf+xml",
+                                "image/png",
+                                "image/jpeg",
+                                "image/gif",
+                                "image/bmp",
+                                "image/tiff",
+                            }:
+                                raise ConversionError("ODT embedded resource type is unsupported.")
+                    for attribute, value in element.attrib.items():
+                        if etree.QName(attribute).localname in {"href", "source", "data-source-name"}:
+                            if not value or value.startswith("#"):
+                                continue
+                            split = urlsplit(value)
+                            member = unquote(split.path)
+                            if (
+                                split.scheme
+                                or split.netloc
+                                or member.startswith(("/", "\\"))
+                                or not member
+                                or member.startswith(".")
+                            ):
+                                raise ConversionError(
+                                    "ODT external links and linked resources are unsupported."
+                                )
+                            safe_relative(member)
+            if not {"mimetype", "content.xml", "meta-inf/manifest.xml"} <= names:
+                raise ConversionError("ODT required package members are missing.")
+            if (
+                roots.get("content.xml") != f"{{{office}}}document-content"
+                or roots.get("meta-inf/manifest.xml") != f"{{{manifest}}}manifest"
+            ):
+                raise ConversionError("ODT document structure is invalid.")
+    except ConversionError:
+        raise
+    except (OSError, ValueError, KeyError, RuntimeError, NotImplementedError, zipfile.BadZipFile) as exc:
+        raise ConversionError("ODT is corrupt or not a supported text document.") from exc
+
+
 def _pdf_configuration(limits):
     from pypdf import apply_configuration
 
@@ -595,14 +761,14 @@ def _office_profile_path(profile):
     return shortened
 
 
-def _docx_to_pdf(source, scratch, limits, progress, cancelled):
+def _office_convert(source, scratch, limits, progress, cancelled, source_kind="docx", target_kind="pdf"):
     executable = libreoffice_executable(limits.get("libreoffice"))
     if not executable:
         raise ConversionError(
-            "DOCX to PDF needs LibreOffice installed locally. Set its soffice executable in the libreoffice setting, then restart CapreConvert."
+            "Document conversion needs LibreOffice installed locally. Set its soffice executable in the libreoffice setting, then restart CapreConvert."
         )
-    _validate_docx(source, limits, cancelled)
-    staged = scratch / "input.docx"
+    (_validate_odt if source_kind == "odt" else _validate_docx)(source, limits, cancelled)
+    staged = scratch / f"input.{source_kind}"
     with source.open("rb") as original, staged.open("xb") as output:
         while chunk := original.read(CHUNK):
             _check_cancelled(cancelled)
@@ -612,7 +778,7 @@ def _docx_to_pdf(source, scratch, limits, progress, cancelled):
     _profile(profile)
     output_dir = scratch / "output"
     output_dir.mkdir()
-    output = output_dir / "input.pdf"
+    output = output_dir / f"input.{target_kind}"
     progress("encoding")
     environment = dict(os.environ)
     for variable in ("PYTHONHOME", "PYTHONPATH"):
@@ -633,7 +799,11 @@ def _docx_to_pdf(source, scratch, limits, progress, cancelled):
                 "--nodefault",
                 "--norestore",
                 "--convert-to",
-                "pdf:writer_pdf_Export",
+                {
+                    "pdf": "pdf:writer_pdf_Export",
+                    "odt": "odt:writer8",
+                    "docx": "docx:Office Open XML Text",
+                }[target_kind],
                 "--outdir",
                 str(_office_cli_path(output_dir)),
                 str(_office_cli_path(staged)),
@@ -649,14 +819,14 @@ def _docx_to_pdf(source, scratch, limits, progress, cancelled):
         while process.poll() is None:
             _check_cancelled(cancelled)
             if time.monotonic() - started > limits["file_timeout_seconds"]:
-                raise ConversionError("DOCX to PDF conversion timed out.")
+                raise ConversionError("LibreOffice document conversion timed out.")
             if output.is_file() and output.stat().st_size > limits["document_output_max_bytes"]:
-                raise ConversionError("Converted PDF exceeds the output size limit.")
+                raise ConversionError("Converted document exceeds the output size limit.")
             _disk_check(scratch, limits["min_free_bytes"])
             time.sleep(0.1)
         if process.returncode or not output.is_file():
             raise ConversionError(
-                "LibreOffice could not convert this DOCX. Check it opens locally and is not password-protected."
+                "LibreOffice could not convert this document. Check it opens locally and is not password-protected."
             )
     finally:
         _stop_process_tree(process)
@@ -694,13 +864,36 @@ def convert_document(
             pages, warnings = _pdf_to_docx(source, output, limits, progress, cancelled)
             progress("validating")
             _validate_docx(output, limits, cancelled, generated=True)
-        elif settings.conversion == "docx_to_pdf":
-            output = _docx_to_pdf(source, scratch, limits, progress, cancelled)
+        elif settings.conversion in {
+            "docx_to_pdf",
+            "odt_to_pdf",
+            "odt_to_docx",
+            "docx_to_odt",
+            "pdf_to_odt",
+        }:
+            from .formats import format_for
+
+            descriptor = format_for(settings)
+            source_kind, target_kind = descriptor.source_format, descriptor.target_format
+            pages, warnings = None, []
+            if source_kind == "pdf":
+                intermediate = scratch / "generated.docx"
+                pages, warnings = _pdf_to_docx(source, intermediate, limits, progress, cancelled)
+                warnings = [warning.replace("PDF to DOCX", "PDF to ODT") for warning in warnings]
+                source, source_kind = intermediate, "docx"
+            output = _office_convert(
+                source, scratch, limits, progress, cancelled, source_kind, target_kind
+            )
             progress("validating")
-            pages = _validate_pdf(output, limits)
-            warnings = [
-                "DOCX to PDF uses local LibreOffice. Fonts missing on this computer may change document layout."
-            ]
+            if target_kind == "pdf":
+                pages = _validate_pdf(output, limits)
+            else:
+                (_validate_odt if target_kind == "odt" else _validate_docx)(
+                    output, limits, cancelled, generated=True
+                )
+            warnings.append(
+                "Local LibreOffice conversion may change layout when fonts or format features differ."
+            )
         else:
             raise ConversionError("Unsupported document conversion type.")
         if not 0 < output.stat().st_size <= limits["document_output_max_bytes"]:

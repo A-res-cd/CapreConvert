@@ -216,7 +216,7 @@ def test_docx_pdf_missing_local_engine_is_honest_and_does_not_upload(browser, li
     page = context.new_page()
     open_home(page, app, url)
     page.locator("#picker-input").select_option("docx")
-    expect(page.locator("#picker-output")).to_have_value("pdf")
+    page.locator("#picker-output").select_option("pdf")
     expect(page.locator("#picker-status")).to_contain_text("Install LibreOffice")
     expect(page.locator("#open-converter")).to_be_disabled()
     page.goto(url + "/#convert=docx_to_pdf")

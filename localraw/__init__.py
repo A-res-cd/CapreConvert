@@ -4,4 +4,4 @@ The localraw package and persisted identities are retained for compatibility.
 """
 
 APP_NAME = "CapreConvert"
-__version__ = "1.0.0"
+__version__ = "1.1.0"

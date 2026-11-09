@@ -53,12 +53,20 @@ class Uploads:
             filename = safe_filename(request.filename)
         except ValueError as exc:
             raise Problem(
-                422, "INVALID_FILENAME", "Choose a safe CR3, ZIP, DOCX, PDF, JPG, PNG or WebP filename."
+                422,
+                "INVALID_FILENAME",
+                "Choose a safe CR3, ZIP, DOCX, ODT, PDF, JPG, PNG or WebP filename.",
             ) from exc
         extension = PurePosixPath(filename).suffix.lower()
-        if extension not in {".cr3", ".zip", ".docx", ".pdf", ".jpg", ".jpeg", ".png", ".webp"}:
+        from .formats import CONVERSIONS
+
+        if extension not in {
+            suffix for entry in CONVERSIONS.values() for suffix in entry.input_extensions
+        }:
             raise Problem(
-                422, "UNSUPPORTED_INPUT", "Supported inputs are CR3, ZIP, DOCX, PDF, JPG, PNG and WebP."
+                422,
+                "UNSUPPORTED_INPUT",
+                "Supported inputs are CR3, ZIP, DOCX, ODT, PDF, JPG, PNG and WebP.",
             )
         limit = (
             self.settings.zip_max_bytes

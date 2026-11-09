@@ -128,3 +128,15 @@ keys, IDs, routes and legacy cr3_to_jpg defaults remain. Picker support/availabi
 only from advertised pairs; labels/ID parsing/extensions do not establish format identity.
 Duplicate pair variants are ambiguous in the picker and disable Open converter; explicit
 advertised deep links still identify an engine unambiguously. No conversion semantics change.
+
+## v1.1 ODF text
+
+`odt` is ODF Text (.odt), category documents. Four additive conversion IDs:
+`odt_to_docx`, `docx_to_odt`, `odt_to_pdf`, `pdf_to_odt`. All need local LibreOffice;
+unavailable pairs retain setup messages. ODT downloads use
+`application/vnd.oasis.opendocument.text`. Input ZIPs remain RAW-only.
+PDF → ODT extracts selectable text through the bounded PDF → DOCX engine before
+LibreOffice exports ODT. No OCR, font/image/table reconstruction or layout fidelity promise.
+ODT previews return bounded JSON with `kind=odt`, plain paragraph blocks, notice,
+truncated and cached fields. The existing protected output-preview route, leases,
+worker admission, direct/selected ZIP exports and recovery rules apply unchanged.
