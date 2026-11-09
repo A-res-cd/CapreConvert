@@ -150,7 +150,7 @@ def main():
         (bundle / "release.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
         (bundle / "START_HERE.txt").write_text(
             f"{APP_NAME} {release.tag} ({release.system}, {release.architecture})\n\n"
-            f"Run {release.executable}. Keep the _internal folder beside it.\n"
+            f"Run Install CapreConvert.cmd once for desktop shortcuts and future updates, or run {release.executable} portably.\nKeep the _internal folder beside the executable.\n"
             "No Python installation is needed to launch this bundled app.\n"
             f"Phone browsers: run {release.executable} --lan and use the console pairing code.\n"
             "Finish current jobs and close an older LocalRAW or CapreConvert instance before launching this copy.\n"
@@ -165,6 +165,13 @@ def main():
             "See validation documentation for executed camera/document checks; smoke alone is not clean-machine validation.\n",
             encoding="utf-8",
         )
+        for title, option in (
+            ("Install CapreConvert", "--install"),
+            ("Update CapreConvert", "--update"),
+        ):
+            (bundle / (title + ".cmd")).write_bytes(
+                f'@echo off\r\n"%~dp0{release.executable}" {option}\r\n'.encode("ascii")
+            )
         smoke = [sys.executable, str(ROOT / "scripts" / "smoke-package.py"), "--dist-dir", str(bundle)]
         if arguments.libreoffice:
             smoke += ["--libreoffice", str(arguments.libreoffice.expanduser().resolve())]

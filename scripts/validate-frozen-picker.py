@@ -36,9 +36,11 @@ def main():
     args = parser.parse_args()
     if args.output.exists():
         parser.error("Report exists; choose a new output")
+    from localraw import __version__
+
     benchmark = module("memory_benchmark", "scripts/benchmark-memory.py")
     smoke = module("package_smoke", "scripts/smoke-package.py")
-    report = {"version": "1.1.0", "checks": [], "memory_profile": args.memory_profile}
+    report = {"version": __version__, "checks": [], "memory_profile": args.memory_profile}
     options = argparse.Namespace(
         executable=args.executable.resolve(),
         source_root=ROOT,
@@ -55,7 +57,7 @@ def main():
                 preview_memory_bytes=256 * 1024**2,
             )
         with benchmark.Application(options, directory / "app", config) as app:
-            assert app.capabilities["application_version"] == "1.1.0"
+            assert app.capabilities["application_version"] == __version__
             # Finish native conversions before launching Chromium on this RAM-limited host.
             content = "Actual frozen DOCX content preview <script>safe text</script>"
             docx_id, job = smoke.upload_and_run(

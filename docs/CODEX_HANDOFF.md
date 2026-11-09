@@ -1,6 +1,30 @@
 # CapreConvert implementation handoff
 
-## Current v1.1.0 delivery
+## Current v1.1.1 desktop installation and updater
+
+Per-user install uses LocalAppData/CapreConvert/versions with an atomic current.json pointer.
+Install CapreConvert.cmd creates Desktop/Start-menu launch, Update and Restore shortcuts.
+The original manager remains for recovery; normal launches retain the minimized host console.
+Only explicit host CLI --update/--check-updates uses GitHub A-res-cd/CapreConvert. No HTTP
+update route, background network check, runtime dependency or workspace migration was added.
+Latest stable ZIP+sidecar names/URLs, bounded transfers, SHA/digest, ZIP paths/types/quotas,
+bundle identity and candidate --version are checked. Old versions and originals remain.
+
+Backend255 pass/3 conditional skips; final targeted39 pass overlap. Real Windows COM shortcuts,
+installed frozen HTTP launch, real-binary update transaction/rollback and live frozen TLS/API
+check pass. Future-release transport is a local fixture; public latest remains1.1.0.
+Packaged six document/nine raster/native preview/export regressions pass with document512
+test caps and unchanged reserve/defaults. Intermediate default smoke passed; final default
+run was RAM-admission blocked. Twenty-one frozen modules match current source. See
+UPDATER_PLAN.md / UPDATER_VALIDATION.md for exact evidence and remaining acceptance limits.
+
+Release: dist/v1.1.1 plus CapreConvert-v1.1.1-windows-x64.zip and checksum (43,269,953bytes;
+515files). SHA256:6e18d5f3ae10ca52df1170b8fcbf3ccc61bd571f2d01f79938055ca07dcedb7a.
+Independent CRC/SHA checks pass; v1.0.0/v1.1.0 releases remain unchanged. Existing users
+need one manual upgrade/install to get the updater; future releases must attach standard
+ZIP+checksum and mark latest stable. No commit/push/publication or user app termination.
+
+## Previous v1.1.0 delivery
 
 ODF Text (.odt) ↔ DOCX and ODT ↔ PDF are available through the capability picker.
 All four pairs need external local LibreOffice. PDF → ODT extracts selectable text through

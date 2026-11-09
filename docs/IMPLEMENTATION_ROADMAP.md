@@ -1,6 +1,15 @@
 # Ordered implementation
 
-Current work: CapreConvert v1.1.0. Follow V1_1_PLAN.md in order for ODT support and release checks.
+Current work: v1.1.1 desktop install/updater. Follow UPDATER_PLAN.md in order.
+
+v1.1.1 gates 1–5 delivered: explicit GitHub updater, per-user versioned install, Desktop/
+Start-menu launch/update/recovery shortcuts, strict downloads/archive validation and atomic
+activation/rollback. Backend255 pass/3 conditional skips; final targeted39 pass overlap.
+Native Windows install/launch/transaction/rollback/live HTTPS checks pass; packaged conversion
+smoke passes with document512 test caps and unchanged reserve/production defaults. Default
+intermediate pass/final RAM admission gap, artifact hash and evidence: UPDATER_VALIDATION.md.
+
+Previous work: CapreConvert v1.1.0. Follow V1_1_PLAN.md in order for ODT support and release checks.
 
 v1.1.0 gates 1–5 complete: four ODT document routes, bounded package validation,
 protected text previews, capability picker/export integration, native/source/browser checks

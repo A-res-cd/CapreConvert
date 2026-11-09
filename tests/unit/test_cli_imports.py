@@ -50,4 +50,4 @@ def test_source_cli_reports_public_brand_and_single_version():
         text=True,
         timeout=30,
     )
-    assert result.stdout.strip() == "CapreConvert 1.1.0"
+    assert result.stdout.strip() == "CapreConvert 1.1.1"

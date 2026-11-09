@@ -21,7 +21,42 @@ def main():
     parser.add_argument("--port", type=int)
     parser.add_argument("--lan", action="store_true", default=None)
     parser.add_argument("--no-browser", action="store_true")
+    desktop = parser.add_mutually_exclusive_group()
+    desktop.add_argument(
+        "--install", action="store_true", help="Install per-user and create Windows shortcuts"
+    )
+    desktop.add_argument(
+        "--update", action="store_true", help="Check GitHub and offer to install the latest release"
+    )
+    desktop.add_argument(
+        "--check-updates", action="store_true", help="Print latest GitHub release without installing"
+    )
+    desktop.add_argument(
+        "--rollback-update", action="store_true", help="Restore the previous installed application"
+    )
+    parser.add_argument("--launch-installed", action="store_true", help=argparse.SUPPRESS)
     arguments = parser.parse_args()
+    if (
+        arguments.install
+        or arguments.update
+        or arguments.check_updates
+        or arguments.rollback_update
+        or arguments.launch_installed
+    ):
+        from .desktop import command, message
+
+        try:
+            command(arguments)
+        except Exception as exc:
+            print(f"CapreConvert installation/update failed: {exc}", flush=True)
+            import os
+
+            if os.name == "nt":
+                message(
+                    f"Could not finish this action.\n{exc}\n\nYour installed versions and files remain available."
+                )
+            raise SystemExit(1) from None
+        return
     from .config import Settings
 
     try:

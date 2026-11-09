@@ -20,11 +20,24 @@ CR3 conversions also accept ZIP archives containing CR3 files. For other formats
 
 ## Run the Windows build
 
-1. Extract `CapreConvert-v1.1.0-windows-x64.zip`.
+1. Extract `CapreConvert-v1.1.1-windows-x64.zip`.
 2. Keep the extracted folder together, including `_internal`.
-3. Run `CapreConvert-v1.1.0.exe`.
+3. Run **Install CapreConvert.cmd** to install for your Windows account and create shortcuts. No administrator account is needed.
+4. Open **CapreConvert** from your desktop or Start menu.
+
+For portable use, run `CapreConvert-v1.1.1.exe` directly instead.
 
 The app opens in your browser. Python is included in the Windows build, so a separate Python installation is not needed. Close an older instance before starting another copy with the same workspace.
+
+The shortcut keeps the host console minimized on your taskbar. Close that console to stop the app; closing only the browser tab leaves it running.
+
+### Future updates
+
+Open **Update CapreConvert** from your desktop or Start menu. It checks the latest published GitHub release and asks before downloading and installing it. You no longer need to download and extract each update yourself. Internet is only used when you run the updater; file conversion remains offline.
+
+Close the running app before launching the updated version. Updates keep your workspace and originals in place, and retain the previous app version. **Restore previous CapreConvert** switches back if needed. Old app files are kept under `%LOCALAPPDATA%\CapreConvert\versions`; updates do not delete them. The updater does not install LibreOffice.
+
+Each future GitHub release needs the Windows ZIP and matching `.zip.sha256` attached and marked as the latest stable release. Existing v1.1.0 users need this one initial manual upgrade to get the updater.
 
 ### LibreOffice document conversions
 
@@ -33,7 +46,7 @@ Install [LibreOffice](https://www.libreoffice.org/download/) on the computer run
 If LibreOffice is installed somewhere the app cannot find, pass its executable path:
 
 ```powershell
-.\CapreConvert-v1.1.0.exe --libreoffice "C:\Program Files\LibreOffice\program\soffice.com"
+.\CapreConvert-v1.1.1.exe --libreoffice "C:\Program Files\LibreOffice\program\soffice.com"
 ```
 
 ## Using the app

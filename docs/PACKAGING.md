@@ -6,22 +6,22 @@ Build each distribution on its target OS. From the project root on Windows:
 .\.venv\Scripts\python.exe scripts/build-package.py
 ```
 
-The version comes from `localraw/__init__.py` (`__version__ = "1.1.0"`). The builder
+The version comes from `localraw/__init__.py` (`__version__ = "1.1.1"`). The builder
 adds the `v` prefix automatically. Set a new version there before the next release;
 Python project metadata, executable name, folder and ZIP use the same value.
 Versions such as `0.2.0rc1` are also supported. There is no cross-compilation.
 
-For version 1.1.0 on Windows x64, this produces:
+For version 1.1.1 on Windows x64, this produces:
 
 ```text
 dist/
-  v1.1.0/
-    CapreConvert-v1.1.0.exe
+  v1.1.1/
+    CapreConvert-v1.1.1.exe
     _internal/
     release.json
     START_HERE.txt
-  CapreConvert-v1.1.0-windows-x64.zip
-  CapreConvert-v1.1.0-windows-x64.zip.sha256
+  CapreConvert-v1.1.1-windows-x64.zip
+  CapreConvert-v1.1.1-windows-x64.zip.sha256
 ```
 
 The command builds in a temporary staging folder, smoke-checks the executable, creates
@@ -33,11 +33,11 @@ A per-version lock prevents concurrent builds into the same output directory.
 Send the ZIP and its checksum together. Extract the ZIP before launching:
 
 ```powershell
-.\dist\v1.1.0\CapreConvert-v1.1.0.exe
-.\dist\v1.1.0\CapreConvert-v1.1.0.exe --lan
+.\dist\v1.1.1\CapreConvert-v1.1.1.exe
+.\dist\v1.1.1\CapreConvert-v1.1.1.exe --lan
 ```
 
-Keep the entire `v1.1.0/` folder. `_internal` holds Python, native libraries,
+Keep the entire `v1.1.1/` folder. `_internal` holds Python, native libraries,
 static assets, distribution metadata and upstream licenses. The end user needs no installed
 Python. Workspace data is separate and survives replacing the application folder.
 Finish jobs and close an older instance before starting a new version with the same
@@ -134,3 +134,20 @@ PDF-text extraction and LibreOffice pipeline exceeds the old compact 384 MiB tes
 uses a 512 MiB document cap and 256 MiB preview cap for tiny validation fixtures, retaining
 the 768 MiB reserve. Packaged defaults remain document 768 MiB / preview 384 MiB.
 Record the selected profile and any default-policy acceptance gap with the release.
+
+
+## v1.1.1 desktop setup and update channel
+
+The builder adds Install CapreConvert.cmd and Update CapreConvert.cmd alongside the
+executable. Install copies the full bundle per-user into LocalAppData/CapreConvert/versions,
+then creates Desktop/Start-menu shortcuts. Conversion workspaces remain separate.
+Normal startup remains offline; only explicit --update or --check-updates contacts GitHub.
+The latest stable release of A-res-cd/CapreConvert must attach the standard Windows x64 ZIP
+and its matching .zip.sha256. The updater checks exact names/URLs, bounded transfers,
+SHA-256 (and GitHub asset digest when supplied), ZIP paths/types/size and candidate --version
+before selecting it atomically. It retains installed versions and an original recovery launcher.
+No admin access, background network check, running-app termination or LibreOffice download.
+Existing pre-updater users need one manual upgrade to v1.1.1. Future updates use the shortcut.
+Rollback switches application files only; future releases must preserve workspace compatibility
+or document manual migration requirements. Checksums establish transfer integrity within the
+trusted GitHub release channel; these packages are not independently code-signed.
